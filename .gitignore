@@ -1,0 +1,10 @@
+*
+!SAVEDATA/
+!SAVEDATA/**
+!PPSSPP_STATE/
+!PPSSPP_STATE/**
+!Cheats/
+!Cheats/**
+!README.md
+!LICENSE
+!.gitignore
