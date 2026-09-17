@@ -1,0 +1,13 @@
+[Unit]
+Description=Backup automático das saves do PPSSPP no git
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=%h/caminho/para/a/pasta/do/psp/scripts/watch.sh
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target

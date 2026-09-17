@@ -67,17 +67,48 @@ gh repo view --web
 
 ## .gitignore
 
-```
+``` .gitignore
 *
-!SAVEDATA/
-!SAVEDATA/**
-!PPSSPP_STATE/
-!PPSSPP_STATE/**
 !Cheats/
 !Cheats/**
-!README.md
-!LICENSE
+!PPSSPP_STATE/
+!PPSSPP_STATE/**
+!SAVEDATA/
+!SAVEDATA/**
+!scripts/
+!scripts/**
+!systemd/
+!systemd/**
 !.gitignore
+!LICENSE
+!README.md
+```
+
+## Automação
+
+Sem branch nem modelo tipo git flow aqui: save é arquivo binário, não tem merge decente, e não existe "feature" pra isolar. O controle é feito assim:
+
+- **Commit automático**: `scripts/watch.sh` fica observando `SAVEDATA/` e `PPSSPP_STATE/` com `inotifywait` e, a cada mudança, espera 15 segundos (pra não commitar no meio de uma gravação) e chama `scripts/backup.sh`, que só commita e dá push se realmente houver mudança.
+- **Checkpoint manual**: pra marcar um momento importante do progresso (antes de um duelo arriscado, antes de zerar o jogo, etc), rode `scripts/checkpoint.sh "mensagem"`. Isso cria uma tag anotada (`checkpoint-AAAAMMDD-HHMMSS`) que fica fácil de achar e voltar depois, sem misturar com os commits automáticos.
+
+### Instalar o serviço de backup automático
+
+Requer `inotify-tools` (`sudo apt install inotify-tools` em distros baseadas em Debian, ou o equivalente da sua distro).
+
+```bash
+chmod +x scripts/*.sh
+mkdir -p ~/.config/systemd/user
+cp systemd/ppsspp-save-backup.service ~/.config/systemd/user/
+# edite o ExecStart dentro do arquivo copiado com o caminho real da pasta do PSP
+systemctl --user daemon-reload
+systemctl --user enable --now ppsspp-save-backup.service
+```
+
+Pra acompanhar o que ele está fazendo:
+
+```bash
+systemctl --user status ppsspp-save-backup.service
+journalctl --user -u ppsspp-save-backup.service -f
 ```
 
 ## Licença
